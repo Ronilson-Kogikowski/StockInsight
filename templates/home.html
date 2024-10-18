@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>StockInsight - Home</title>
+</head>
+<body>
+    <div class="form-container">
+        <h1 class="welcome-title">Bem-vindo ao StockInsight!</h1>
+        <form method="POST" action="/detalhes">
+            <input type="text" name="ticker" placeholder="Digite o ticker da ação" required>
+            <input type="submit" value="Buscar">
+        </form>
+    </div>
+</body>
+</html>

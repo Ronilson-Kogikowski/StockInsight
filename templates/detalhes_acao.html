@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Ação - {{ ticker }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>StockInsight</h1>
+        <nav>
+            <a href="{{ url_for('historico', ticker=ticker) }}" class="btn">Histórico</a>
+            <a href="{{ url_for('previsao', ticker=ticker) }}" class="btn">Previsão</a>
+            <a href="{{ url_for('home') }}" class="btn">Home</a>
+        </nav>
+    </header>
+    <div class="details-box">
+        <h4>Detalhes da Ação</h4>
+        <ul>
+            <li>Nome da Empresa: <span class="detail-item">{{ detalhes.nome_empresa }}</span></li>
+            <li>Preço de Abertura: <span class="detail-item">R$ {{ detalhes.preco_inicio | round(2) }}</span></li>
+            <li>Preço de Fechamento: <span class="detail-item">R$ {{ detalhes.preco_fechamento | round(2) }}</span></li>
+            <li>Preço Máximo: <span class="detail-item">R$ {{ detalhes.preco_maximo | round(2) }}</span></li>
+            <li>Preço Mínimo: <span class="detail-item">R$ {{ detalhes.preco_minimo | round(2) }}</span></li>
+            <li>Volume: <span class="detail-item">{{ detalhes.volume }}</span></li>
+        </ul>
+    </div>
+</body>
+</html>

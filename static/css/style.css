@@ -1,0 +1,132 @@
+/* Estilo básico para toda a página */
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/static/img/background.jpg');
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    color: #fff;
+    padding-top: 100px;
+}
+
+/* Estilo para o cabeçalho */
+header {
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+h1 {
+    color: #fff;
+    margin: 0;
+}
+
+/* Navegação */
+nav {
+    margin-top: 20px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    margin: 0 30px; /* Aumenta ainda mais o espaço entre os botões */
+    background-color: rgba(0, 123, 255, 0.7); /* Azul quase transparente */
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s; /* Transição suave */
+}
+
+nav a:hover {
+    background-color: rgba(0, 123, 255, 1); /* Azul sólido ao passar o mouse */
+    transform: translateY(-2px); /* Levanta o botão ao passar o mouse */
+}
+
+/* Estilo para os detalhes */
+.details-box, .forecast-box {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 50%;
+    text-align: center; /* Centraliza o texto */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s; /* Transição suave */
+}
+
+.details-box:hover, .forecast-box:hover {
+    transform: translateY(-5px); /* Levanta o box ao passar o mouse */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3); /* Aumenta a sombra */
+}
+
+.details-box h4, .forecast-box h2 {
+    margin: 20px 0;
+}
+
+.details-box ul, .forecast-box ul {
+    list-style-type: none; /* Remove os marcadores da lista */
+    padding: 0; /* Remove o espaçamento padrão */
+    margin: 0; /* Remove a margem padrão */
+}
+
+.details-box li, .forecast-box li {
+    background-color: rgba(0, 0, 0, 0.6); /* Cor de fundo do item */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 10px; /* Espaçamento interno */
+    margin-bottom: 10px; /* Espaço entre os itens da lista */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra */
+    transition: transform 0.2s, box-shadow 0.2s; /* Transição suave */
+    text-align: center; /* Centraliza o texto dos itens */
+}
+
+.details-box li:hover, .forecast-box li:hover {
+    transform: translateY(-2px); /* Levanta o item ao passar o mouse */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4); /* Aumenta a sombra */
+}
+
+/* Estilo para o gráfico na página de histórico */
+.chart-container {
+    margin-top: 80px; /* Ajuste este valor para afastar o gráfico do cabeçalho */
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 768px) {
+    .details-box,
+    .forecast-box {
+        width: 90%; /* Ajusta a largura para dispositivos móveis */
+    }
+
+    nav a {
+        display: block; /* Muda os links da navegação para bloco em dispositivos móveis */
+        margin: 10px 0; /* Margem entre os links */
+    }
+}
+
+/* Estilo para os itens da lista nas caixas de detalhes e previsão */
+.details-box li, .forecast-box li {
+    background-color: rgba(0, 0, 0, 0.6); /* Cor de fundo do item */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 10px; /* Espaçamento interno */
+    margin-bottom: 10px; /* Espaço entre os itens da lista */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra */
+    transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* Transição suave */
+    text-align: center; /* Centraliza o texto dos itens */
+}
+
+/* Efeito ao passar o mouse sobre os itens da lista */
+.details-box li:hover, .forecast-box li:hover {
+    transform: translateY(-2px); /* Levanta o item ao passar o mouse */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4); /* Aumenta a sombra */
+    color: #ffcc00; /* Muda a cor do texto ao passar o mouse (exemplo: amarelo) */
+    background-color: rgba(0, 123, 255, 0.8); /* Muda a cor de fundo ao passar o mouse */
+}

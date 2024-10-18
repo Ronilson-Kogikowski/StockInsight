@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Histórico - {{ ticker }}</title>
+</head>
+<body>
+    <header>
+        <h1>StockInsight</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/detalhes/{{ ticker }}">Detalhes</a>
+            <a href="/previsao/{{ ticker }}">Previsão</a>
+        </nav>
+    </header>
+    <div class="chart-container">
+        {% if grafico_html %}
+            {{ grafico_html|safe }}
+        {% else %}
+            <p>{{ erro }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
