@@ -15,18 +15,12 @@ Plotly: Para renderização de gráficos interativos.
 HTML e CSS: Para construção de uma interface amigável.
 Como Executar o Projeto
 Clone este repositório:
-bash
-Copiar código
-git clone https://github.com/SEU_USUARIO/StockInsight.git
+git clone https://github.com/Ronilson-Kogikowski/StockInsight.git
 cd StockInsight
 Crie um ambiente virtual e instale as dependências:
-bash
-Copiar código
 python -m venv venv
 source venv/bin/activate  # (ou venv\Scripts\activate no Windows)
 pip install -r requirements.txt
 Inicie o servidor Flask:
-bash
-Copiar código
 python app.py
 Acesse o projeto em http://127.0.0.1:5000.
