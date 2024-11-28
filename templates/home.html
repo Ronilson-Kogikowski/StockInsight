@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <title>StockInsight - Home</title>
+    <title>StockInsight</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="form-container">
-        <h1 class="welcome-title">Bem-vindo ao StockInsight!</h1>
-        <form method="POST" action="/detalhes">
-            <input type="text" name="ticker" placeholder="Digite o ticker da ação" required>
-            <input type="submit" value="Buscar">
-        </form>
-    </div>
+    <h1>Bem-vindo ao StockInsight!</h1>
+    <form method="POST">
+        <label for="ticker">Digite o ticker da ação:</label>
+        <input type="text" id="ticker" name="ticker">
+        <button type="submit">Pesquisar</button>
+    </form>
+
+    {% if erro %}
+        <div class="error-message" style="color: red;">
+            <p>{{ erro }}</p>
+        </div>
+    {% endif %}
 </body>
 </html>

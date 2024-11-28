@@ -3,95 +3,103 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import plotly.graph_objs as go
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
-
-@app.route('/detalhes', methods=['GET', 'POST'])
-def detalhes():
+    erro = None  # Inicializa a variável de erro como None
     if request.method == 'POST':
         ticker = request.form.get('ticker')
-        if ticker:
-            return redirect(url_for('detalhes_acao', ticker=ticker))
-    return redirect(url_for('home'))
+        if not ticker:  # Verifica se o ticker está vazio
+            erro = 'Por favor, insira um ticker válido'  # Mensagem de erro se estiver vazio
+        else:
+            acao = yf.Ticker(ticker)
+            try:
+                historico = acao.history(period="1d")
+                if historico.empty:
+                    erro = f"Ação '{ticker}' não encontrada. Por favor, verifique o ticker e tente novamente."
+                else:
+                    return redirect(url_for('detalhes_acao', ticker=ticker))
+            except Exception as e:
+                erro = f"Ocorreu um erro ao buscar a ação '{ticker}': {str(e)}. Por favor, tente novamente."
+    return render_template('home.html', erro=erro)
 
 @app.route('/detalhes/<ticker>')
 def detalhes_acao(ticker):
     acao = yf.Ticker(ticker)
-    info = acao.info
-
-    # Obtendo os detalhes da ação
-    detalhes = {
-        'nome_empresa': info.get('shortName', 'N/A'),
-        'preco_inicio': None,
-        'preco_fechamento': None,
-        'preco_maximo': None,
-        'preco_minimo': None,
-        'volume': None,
-    }
-
-    # Obtendo o histórico para 1 dia
-    historico_dia = acao.history(period='1d')
-    
-    # Verifica se há dados disponíveis
-    if not historico_dia.empty:
-        detalhes['preco_inicio'] = historico_dia['Open'][0]
-        detalhes['preco_fechamento'] = historico_dia['Close'][0]
-        detalhes['preco_maximo'] = historico_dia['High'][0]
-        detalhes['preco_minimo'] = historico_dia['Low'][0]
-        detalhes['volume'] = historico_dia['Volume'][0]
-    else:
-        detalhes['nome_empresa'] = 'N/A'
-    
-    return render_template('detalhes_acao.html', detalhes=detalhes, ticker=ticker)
+    try:
+        info = acao.info
+        detalhes = {
+            'nome_empresa': info.get('shortName', 'N/A'),
+            'preco_inicio': None,
+            'preco_fechamento': None,
+            'preco_maximo': None,
+            'preco_minimo': None,
+            'volume': None,
+        }
+        historico_dia = acao.history(period='1d')
+        if not historico_dia.empty:
+            detalhes['preco_inicio'] = round(historico_dia['Open'].iloc[0], 2)
+            detalhes['preco_fechamento'] = round(historico_dia['Close'].iloc[0], 2)
+            detalhes['preco_maximo'] = round(historico_dia['High'].iloc[0], 2)
+            detalhes['preco_minimo'] = round(historico_dia['Low'].iloc[0], 2)
+            detalhes['volume'] = int(historico_dia['Volume'].iloc[0])
+        else:
+            detalhes['nome_empresa'] = 'N/A'
+        return render_template('detalhes_acao.html', detalhes=detalhes, ticker=ticker)
+    except Exception as e:
+        erro = f"Erro ao buscar os detalhes da ação '{ticker}': {str(e)}."
+        return render_template('detalhes_acao.html', erro=erro, ticker=ticker)
 
 @app.route('/historico/<ticker>')
 def historico(ticker):
     acao = yf.Ticker(ticker)
-    historico = acao.history(period='1y')
-
-    if historico.empty:
-        return render_template('historico_acao.html', grafico_html=None, ticker=ticker, erro='Não foram encontrados dados para o ticker fornecido.')
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=historico.index, y=historico['Close'], mode='lines', name='Preço de Fechamento'))
-    
-    # Ajuste o tamanho do gráfico aqui
-    fig.update_layout(
-        title=f'Histórico de Preços - {ticker}', 
-        xaxis_title='Data', 
-        yaxis_title='Preço de Fechamento (R$)',
-        width=1200,  # Largura do gráfico
-        height=600   # Altura do gráfico
-    )
-
-    grafico_html = fig.to_html(full_html=False)
-    return render_template('historico_acao.html', grafico_html=grafico_html, ticker=ticker)
+    try:
+        historico = acao.history(period='1y')
+        if historico.empty:
+            return render_template('historico_acao.html', grafico_html=None, ticker=ticker, erro='Não foram encontrados dados.')
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=historico.index, y=historico['Close'], mode='lines', name='Preço de Fechamento'))
+        fig.update_layout(
+            title=f'Histórico de Preços - {ticker}', 
+            xaxis_title='Data', 
+            yaxis_title='Preço de Fechamento (R$)',
+            width=1200, height=600, margin=dict(t=50, b=50, l=50, r=50)
+        )
+        grafico_html = fig.to_html(full_html=False)
+        return render_template('historico_acao.html', grafico_html=grafico_html, ticker=ticker)
+    except Exception as e:
+        erro = f"Erro ao buscar o histórico da ação '{ticker}': {str(e)}."
+        return render_template('historico_acao.html', grafico_html=None, ticker=ticker, erro=erro)
 
 @app.route('/previsao/<ticker>')
 def previsao(ticker):
     acao = yf.Ticker(ticker)
-    historico = acao.history(period='1y')
-    close_prices = historico['Close'].values
+    try:
+        historico = acao.history(period='1y')
+        close_prices = historico['Close']
+        
+        if len(close_prices) < 2:
+            return render_template('previsao_acao.html', previsoes=None, ticker=ticker, erro='Não há dados suficientes para previsão.')
+        
+        # Treinando o modelo ARIMA
+        modelo = ARIMA(close_prices, order=(5, 1, 0))  # Ajuste de ordem (p,d,q)
+        modelo_fit = modelo.fit()
 
-    if len(close_prices) == 0:
-        return render_template('previsao_acao.html', previsoes=None, ticker=ticker, erro='Não há dados suficientes para realizar a previsão.')
-
-    dias = np.arange(len(close_prices)).reshape(-1, 1)
-    modelo = LinearRegression()
-    modelo.fit(dias, close_prices)
-
-    dias_futuros = np.arange(len(close_prices), len(close_prices) + 10).reshape(-1, 1)
-    previsoes = modelo.predict(dias_futuros)
-
-    datas_previsao = [datetime.today().date() + timedelta(days=i) for i in range(1, 11)]
-    previsoes_dict = dict(zip(datas_previsao, previsoes))
-
-    return render_template('previsao_acao.html', previsoes=previsoes_dict, ticker=ticker)
+        # Previsão para os próximos 10 dias
+        previsoes = modelo_fit.forecast(steps=10)
+        
+        # Gerando as datas para previsão
+        datas_previsao = [datetime.today().date() + timedelta(days=i) for i in range(1, 11)]
+        previsoes_dict = dict(zip(datas_previsao, [round(p, 2) for p in previsoes]))
+        
+        return render_template('previsao_acao.html', previsoes=previsoes_dict, ticker=ticker)
+    
+    except Exception as e:
+        erro = f"Erro ao buscar a previsão da ação '{ticker}': {str(e)}."
+        return render_template('previsao_acao.html', previsoes=None, ticker=ticker, erro=erro)
 
 if __name__ == '__main__':
     app.run(debug=True)
